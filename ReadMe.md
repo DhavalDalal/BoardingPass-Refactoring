@@ -16,3 +16,8 @@ Based on the channel used by the passenger to checkin, following types of boardi
     * Electronic boarding pass (.psf file)
     * Calendar entry (.ics file) with Mobile boarding pass (.pdf file) as an attachment.
 
+
+## Build
+* To build, simply run ```gradle```
+* To generate Eclipse project: use ```gradle cleanEclipse eclipse```
+* To generate an Idea project: use ```gradle cleanIdea idea```
