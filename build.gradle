@@ -1,0 +1,68 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+defaultTasks 'clean', 'build'
+
+project.ext {
+    //libs
+    groovy = 'org.codehaus.groovy:groovy-all:2.4.11'
+    junit = 'junit:junit:4.11'
+    qrCode = 'com.github.kenglxn.QRGen:javase:2.3.0'
+    iCal = 'org.mnode.ical4j:ical4j:1.0.3'
+    iText = 'com.itextpdf:itextpdf:5.2.1'
+    jodaTime = 'joda-time:joda-time:2.9.9'
+
+    //Resources
+    resourcesDir = 'src/main/resources'
+}
+
+//  For gradle version below 2.1
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+//sourceSets.main.java.srcDirs = []
+//http://forums.gradle.org/gradle/topics/how_to_compile_groovy_sources_mixed_with_java_sources
+sourceSets.main.groovy.srcDirs += ["src/main/java"]
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+
+
+dependencies {
+    compile(project.ext.groovy, project.ext.qrCode, project.ext.iCal, project.ext.iText, project.ext.jodaTime)
+    testCompile(project.ext.junit,)
+}
+
+
+eclipse {
+    classpath {
+        downloadSources=true
+    }
+}
+
+idea {
+    module {
+        // if you hate browsing Javadoc
+        downloadJavadoc = false
+
+        // and love reading sources :)
+        downloadSources = true
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
+}
+
