@@ -37,10 +37,10 @@ public class ElectronicBoardingPassTest {
     private static byte[] pdfData;
 
     @BeforeClass
-    public static void setUp() throws ValidationException, WriterException, IOException, DocumentException, URISyntaxException {
+    public static void setUp() throws Exception {
         boardingPass = new BoardingPass(flight, passenger, pnr, seat, seqNo);
-        pdfData = boardingPass.render(BoardingPass.Type.ELECTRONIC);
-        pdfDataAsText = Arrays.asList(pdfToText(pdfData).split("\\n"));
+        pdfData = boardingPass.render(BoardingPass.Channel.DESKTOP).get(0);
+        pdfDataAsText = Arrays.asList(pdfToText(pdfData).split(System.getProperty("line.separator")));
     }
 
     @Test
@@ -163,8 +163,8 @@ public class ElectronicBoardingPassTest {
 
     @Test
     public void endsWithAirlineFooter() throws Exception {
-        final String lastLine = pdfDataAsText.get(pdfDataAsText.size() - 1);
-        assertEquals("Airline footer must be present", "DD Airways Electronic Boarding Pass - Wish you a Pleasant Flight", lastLine);
+        final String footer = pdfDataAsText.get(pdfDataAsText.size() - 1);
+        assertEquals("Airline footer must be present", "DD Airways Electronic Boarding Pass - Wish you a Pleasant Flight", footer);
     }
 
     @Test

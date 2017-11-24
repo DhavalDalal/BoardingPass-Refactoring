@@ -6,13 +6,10 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.itextpdf.text.*;
-import com.itextpdf.text.List;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.DottedLineSeparator;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.*;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
@@ -27,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -436,7 +434,7 @@ public class BoardingPass {
         return out.toByteArray();
     }
 
-    public byte[] render(Type type) throws URISyntaxException, WriterException, ValidationException, DocumentException, IOException {
+    private byte[] render(Type type) throws URISyntaxException, WriterException, ValidationException, DocumentException, IOException {
         try {
             if (type == Type.MOBILE) {
                 return createPdfMobileBoardingPass();
@@ -460,16 +458,31 @@ public class BoardingPass {
         return new byte[]{};
     }
 
-    public FileOutputStream renderFor(Channel channel) throws Exception {
+
+    public List<byte[]> render(Channel channel) throws Exception {
+        if(channel == Channel.AIRPORT_COUNTER || channel == Channel.KIOSK) {
+            return Arrays.asList(render(Type.KIOSK));
+        }
+        if(channel == Channel.DESKTOP) {
+            return Arrays.asList(render(Type.ELECTRONIC), render(Type.CALENDAR_EVENT));
+//            return Arrays.asList(render(Type.MOBILE), render(Type.CALENDAR_EVENT));
+        }
+        if(channel == Channel.MOBILE) {
+            return Arrays.asList(render(Type.MOBILE), render(Type.CALENDAR_EVENT));
+        }
+        return Collections.emptyList();
+    }
+
+    public void writeFileFor(Channel channel) throws Exception {
         FileOutputStream fos = null;
-        if(channel == Channel.AIRPORT_COUNTER) {
+        final List<byte[]> bytes = render(channel);
+        if(channel == Channel.AIRPORT_COUNTER || channel == Channel.KIOSK) {
             fos = new FileOutputStream("kiosk-boarding-pass-" + pnr + "-" + passenger.getLastName() + ".pdf");
-            fos.write(render(Type.KIOSK));
+            fos.write(bytes.get(0));
         }
         if(channel == Channel.DESKTOP) {
             fos = new FileOutputStream("desktop-boarding-passes-" + pnr + "-" + passenger.getLastName() + ".zip");
             ZipOutputStream zip = new ZipOutputStream(fos);
-            final java.util.List<byte[]> bytes = Arrays.asList(render(Type.ELECTRONIC), render(Type.CALENDAR_EVENT));
             final java.util.List<String> fileNames = Arrays.asList(
                     "electronic-boarding-pass-" + pnr + "-" + passenger.getLastName() + ".pdf",
                     "calendar-boarding-event-" + pnr + "-" + passenger.getLastName()  + ".ics");
@@ -482,17 +495,16 @@ public class BoardingPass {
             }
             zip.finish();
             zip.close();
-            return fos;
         }
         if(channel == Channel.MOBILE) {
+            fos = new FileOutputStream("mobile-boarding-pass-" + pnr + "-" + passenger.getLastName() + ".pdf");
+            fos.write(bytes.get(0));
+            fos.flush();
+            fos.close();
             fos = new FileOutputStream("calendar-boarding-event-" + pnr + "-" + passenger.getLastName() + ".ics");
-            fos.write(render(Type.CALENDAR_EVENT));
-        }
-        if(channel == Channel.KIOSK) {
-            fos = new FileOutputStream("kiosk-boarding-pass-" + pnr + "-" + passenger.getLastName() + ".pdf");
-            fos.write(render(Type.KIOSK));
+            fos.write(bytes.get(1));
         }
         fos.flush();
-        return fos;
+        fos.close();
     }
 }

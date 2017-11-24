@@ -14,14 +14,14 @@ public class BoardingPassMain {
         final String seat = "10D";
         final String seqNo = "0018";
         BoardingPass boardingPass = new BoardingPass(flight, passenger, pnr, seat, seqNo);
-        boardingPass.renderFor(BoardingPass.Channel.DESKTOP);
-        boardingPass.renderFor(BoardingPass.Channel.MOBILE);
+        boardingPass.writeFileFor(BoardingPass.Channel.DESKTOP);
+        boardingPass.writeFileFor(BoardingPass.Channel.MOBILE);
 
         //Kiosk and Counter boarding passes have gate information
         final String gate = "45C";
         boardingPass = new BoardingPass(flight, passenger, pnr, seat, seqNo, gate);
-        boardingPass.renderFor(BoardingPass.Channel.AIRPORT_COUNTER);
-        boardingPass.renderFor(BoardingPass.Channel.KIOSK);
+        boardingPass.writeFileFor(BoardingPass.Channel.AIRPORT_COUNTER);
+        boardingPass.writeFileFor(BoardingPass.Channel.KIOSK);
     }
 
 }

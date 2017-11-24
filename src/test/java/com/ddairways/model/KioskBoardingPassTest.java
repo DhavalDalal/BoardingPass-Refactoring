@@ -36,10 +36,10 @@ public class KioskBoardingPassTest {
     private static byte[] pdfData;
 
     @BeforeClass
-    public static void setUp() throws ValidationException, WriterException, IOException, DocumentException, URISyntaxException {
+    public static void setUp() throws Exception {
         boardingPass = new BoardingPass(flight, passenger, pnr, seat, seqNo, gate);
-        pdfData = boardingPass.render(BoardingPass.Type.KIOSK);
-        pdfAsText = Arrays.asList(pdfToText(pdfData).split("\\n"));
+        pdfData = boardingPass.render(BoardingPass.Channel.AIRPORT_COUNTER).get(0);
+        pdfAsText = Arrays.asList(pdfToText(pdfData).split(System.getProperty("line.separator")));
     }
 
     @Test
