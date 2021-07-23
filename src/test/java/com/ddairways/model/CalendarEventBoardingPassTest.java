@@ -36,8 +36,8 @@ public class CalendarEventBoardingPassTest {
     private static List<VEvent> calendarEvents;
 
     @BeforeClass
-    public static void setUp() throws ValidationException, WriterException, IOException, DocumentException, URISyntaxException, ParserException {
-        byte[] calendarEventData = boardingPass.render(BoardingPass.Type.CALENDAR_EVENT);
+    public static void setUp() throws Exception {
+        byte[] calendarEventData = boardingPass.render(BoardingPass.Channel.MOBILE).get(1);
         CalendarBuilder builder = new CalendarBuilder();
         Calendar calendar = builder.build(new ByteArrayInputStream(calendarEventData));
         calendarEvents = extractEvents(calendar);
@@ -86,14 +86,14 @@ public class CalendarEventBoardingPassTest {
     }
 
     @Test
-    public void eventHasPassengerMobileBoardingPassAttached() throws URISyntaxException, WriterException, IOException, DocumentException, ValidationException {
+    public void eventHasPassengerMobileBoardingPassAttached() throws Exception {
         final VEvent travelEvent = calendarEvents.get(0);
         final Attach mobileBoardingPass = (Attach) travelEvent.getProperties("ATTACH").get(0);
         ParameterList params = new ParameterList();
         params.add(Value.BINARY);
         params.add(Encoding.BASE64);
         params.add(new FmtType("Mobile Boarding Pass.pdf"));
-        byte[] attachBoardingPass = boardingPass.render(BoardingPass.Type.MOBILE) ;
+        byte[] attachBoardingPass = boardingPass.render(BoardingPass.Channel.MOBILE).get(0);
         Attach expected = new Attach(params, attachBoardingPass);
         assertEquals(expected.getBinary().length, mobileBoardingPass.getBinary().length);
     }

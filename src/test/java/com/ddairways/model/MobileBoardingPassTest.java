@@ -35,11 +35,11 @@ public class MobileBoardingPassTest {
     private static byte[] pdfData;
 
     @BeforeClass
-    public static void setUp() throws ValidationException, WriterException, IOException, DocumentException, URISyntaxException {
+    public static void setUp() throws Exception {
         boardingPass = new BoardingPass(flight, passenger, pnr, seat, seqNo);
-        pdfData = boardingPass.render(BoardingPass.Type.MOBILE);
+        pdfData = boardingPass.render(BoardingPass.Channel.MOBILE).get(0);
 //        PdfContentReaderTool.listContentStreamForPage(new PdfReader(pdfData),1, new PrintWriter(System.out));
-        pdfAsText = Arrays.asList(pdfToText(pdfData).split("\\n"));
+        pdfAsText = Arrays.asList(pdfToText(pdfData).split(System.getProperty("line.separator")));
     }
 
     @Test
@@ -96,8 +96,8 @@ public class MobileBoardingPassTest {
 
     @Test
     public void endsWithFooter() throws Exception {
-        final String lastLine = pdfAsText.get(pdfAsText.size() - 1);
-        assertEquals("Mobile Boarding Pass", lastLine);
+        final String footer = pdfAsText.get(pdfAsText.size() - 1);
+        assertEquals("Mobile Boarding Pass", footer);
     }
 
     @Test
