@@ -1,50 +1,48 @@
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
-defaultTasks 'clean', 'build'
-
-project.ext {
-    //libs
-    groovy = 'org.codehaus.groovy:groovy-all:2.4.11'
-    junit = 'junit:junit:4.11'
-    qrCode = 'com.github.kenglxn.QRGen:javase:2.3.0'
-    iCal = 'org.mnode.ical4j:ical4j:1.0.3'
-    iText = 'com.itextpdf:itextpdf:5.2.1'
-    jodaTime = 'joda-time:joda-time:2.9.9'
-
-    //Resources
-    resourcesDir = 'src/main/resources'
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+	id 'groovy'
 }
 
-//  For gradle version below 2.1
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
-
-//sourceSets.main.java.srcDirs = []
-//http://forums.gradle.org/gradle/topics/how_to_compile_groovy_sources_mixed_with_java_sources
-sourceSets.main.groovy.srcDirs += ["src/main/java"]
-
+group = 'com.ddairways.model'
+version = '1.0.0'
+sourceCompatibility = '11'
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
+    jcenter()
+//    maven { url 'https://repo.spring.io/milestone' }
+//	maven {
+//		url "https://plugins.gradle.org/m2/"
+//	}
     maven {
         url "https://jitpack.io"
     }
 }
 
-
-
 dependencies {
-    compile(project.ext.groovy, project.ext.qrCode, project.ext.iCal, project.ext.iText, project.ext.jodaTime)
-    testCompile(project.ext.junit,)
+
+    //libs
+    implementation 'org.codehaus.groovy:groovy-all:2.4.11'
+
+    implementation 'com.github.kenglxn.QRGen:javase:2.3.0'
+    implementation 'org.mnode.ical4j:ical4j:1.0.3'
+    implementation 'com.itextpdf:itextpdf:5.2.1'
+    implementation 'joda-time:joda-time:2.9.9'
+    testImplementation 'junit:junit:4.11'
+    // testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    // testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+    // testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 }
 
+
+project.ext {
+
+    //Resources
+    resourcesDir = 'src/main/resources'
+}
 
 eclipse {
     classpath {
@@ -61,8 +59,3 @@ idea {
         downloadSources = true
     }
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
-}
-
